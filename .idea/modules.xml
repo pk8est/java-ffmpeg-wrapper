@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/v-huya.iml" filepath="$PROJECT_DIR$/v-huya.iml" />
+      <module fileurl="file://$PROJECT_DIR$/v-huya-ffmpeg/v-huya-ffmpeg.iml" filepath="$PROJECT_DIR$/v-huya-ffmpeg/v-huya-ffmpeg.iml" />
+    </modules>
+  </component>
+</project>
