@@ -1,2 +1,2 @@
 # java-ffmpeg-wrapper
-## 参考
+## git remote add origin git@github.com:pk8est/java-ffmpeg-wrapper.git
