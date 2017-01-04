@@ -152,6 +152,7 @@ public class Progress {
     }
 
     public boolean initValue(String key, String value){
+        if("N/A".equalsIgnoreCase(value)) return  false;
         switch (key) {
             case "frame":
                 frame = Long.parseLong(value);

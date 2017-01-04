@@ -57,7 +57,6 @@ public class FFmpegBuilder extends CommonBuilder {
     boolean pipe = false;
     final List<String> inputs = new ArrayList<>();
 
-
     public FFmpegBuilder(){}
 
     public void setPipe(boolean pipe){
