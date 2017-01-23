@@ -7,5 +7,5 @@ package com.huya.v.transcode.progress;
 public interface ProgressListener {
     // Called every time there is status, typically once a second, and at the end.
     // The Progress.status will normally be CONTINUE, until after the last frame, when it will be END.
-    void progress(Progress progress, String line);
+    void progress(Progress progress, String line) throws Exception;
 }

@@ -21,16 +21,12 @@ public class ProgressDataReader {
         this.out = new BufferedOutputStream(stream, size);
     }
 
-    public void run(byte[] buf, int len){
-        try{
-            if(listener != null){
-                writeListener(buf, len);
-            }
-            if(out != null){
-                writeOut(buf, len);
-            }
-        }catch (IOException e){
-            e.printStackTrace();
+    public void run(byte[] buf, int len) throws IOException {
+        if(listener != null){
+            writeListener(buf, len);
+        }
+        if(out != null){
+            writeOut(buf, len);
         }
     }
 

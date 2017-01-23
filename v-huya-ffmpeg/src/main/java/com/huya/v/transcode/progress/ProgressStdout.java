@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * Created by Administrator on 2016/12/25.
  */
-public class ProgressStdout implements Runnable {
+public class ProgressStdout {
 
     private int size = 4096;
     private InputStream in;
@@ -37,21 +37,16 @@ public class ProgressStdout implements Runnable {
         this.size = size;
     }
 
-    @Override
-    public void run(){
-        try{
-            byte[] buf = new byte[size];
-            int len = in.read(buf);
-            while (len != -1) {
-                dispatch(buf, len);
-                len = in.read(buf);
-            }
-        }catch (IOException e){
-            e.printStackTrace();
+    public void run() throws IOException {
+        byte[] buf = new byte[size];
+        int len = in.read(buf);
+        while (len != -1) {
+            dispatch(buf, len);
+            len = in.read(buf);
         }
     }
 
-    protected void dispatch(byte[] buf, int len){
+    protected void dispatch(byte[] buf, int len) throws IOException {
         if(progressDataReaders.size() > 0){
             for (ProgressDataReader progressDataReader: progressDataReaders){
                 progressDataReader.run(buf, len);

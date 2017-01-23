@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<configuration>
+	<appender name="ROLLFILE"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${log.dir}/lockback.log</file>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<!-- daily rollover -->
+			<fileNamePattern>${log.dir}/ffmpeg-wrapper.%d{yyyy-MM-dd,Asia/Hong_Kong}.gz</fileNamePattern>
+
+			<!-- keep 7 days' worth of history -->
+			<maxHistory>7</maxHistory>
+		</rollingPolicy>
+
+		<encoder>
+			<pattern>%date %level [%thread] %logger{35} [%file:%line] %msg%n
+			</pattern>
+		</encoder>
+	</appender>
+
+	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n
+			</pattern>
+		</encoder>
+	</appender>
+
+	<root level="${log.level}">
+		<appender-ref ref="${log.appender}" />
+	</root>
+
+</configuration>

@@ -1,6 +1,5 @@
 package com.huya.v.transcode.job;
 
-import com.google.common.base.Throwables;
 import com.huya.v.transcode.FFmpeg;
 import com.huya.v.transcode.FFprobe;
 import com.huya.v.transcode.builder.FFmpegBuilder;
@@ -91,11 +90,9 @@ public class TwoPassFFmpegJob extends FFmpegJob {
             }
             state = State.FINISHED;
 
-        } catch (Throwable t) {
+        } catch (IOException e) {
             state = State.FAILED;
-
-            Throwables.throwIfUnchecked(t);
-            throw new RuntimeException(t);
+            errorMessage = e.getMessage();
         }
     }
 

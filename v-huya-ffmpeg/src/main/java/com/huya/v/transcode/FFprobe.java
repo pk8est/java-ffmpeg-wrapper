@@ -3,6 +3,8 @@ package com.huya.v.transcode;
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.Gson;
+import com.huya.v.transcode.builder.FFmpegBuilder;
+import com.huya.v.transcode.builder.FFmpegInputBuilder;
 import com.huya.v.transcode.execute.Processor;
 import com.huya.v.transcode.execute.RunProcessor;
 import com.huya.v.transcode.ffprobe.FFmpegProbeResult;
@@ -43,10 +45,14 @@ public class FFprobe extends FFcommon{
     }
 
     public FFmpegProbeResult probe(String mediaPath) throws IOException {
-        return probe(mediaPath, null);
+        return probe(new FFmpegInputBuilder(mediaPath), null);
     }
 
-    public FFmpegProbeResult probe(String mediaPath, @Nullable String userAgent) throws IOException {
+    public FFmpegProbeResult probe(FFmpegInputBuilder input) throws IOException {
+        return probe(input, null);
+    }
+
+    public FFmpegProbeResult probe(FFmpegInputBuilder input, @Nullable String userAgent) throws IOException {
         checkIfFFprobe();
         ImmutableList.Builder<String> args = new ImmutableList.Builder<String>();
         args.add(path).add("-v", "quiet");
@@ -60,10 +66,13 @@ public class FFprobe extends FFcommon{
             .add("-show_format")
             .add("-show_streams")
             .add("-threads", "1")
-            .add(mediaPath);
+            .addAll(input.build(new FFmpegBuilder()));
 
         Process p = runProcessor.run(args.build());
         try {
+            if(input.isPipe()){
+                readStdin(input.getInputStream(), p);
+            }
             Reader reader = wrapInReader(p);
             if (LOG.isDebugEnabled()) {
                 reader = new LoggingFilterReader(reader, LOG);

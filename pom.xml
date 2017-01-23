@@ -2,23 +2,15 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.huya.v</groupId>
-	<artifactId>v-huya</artifactId>
+	<artifactId>ffmpeg-wrapper</artifactId>
 	<version>0.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
-	<name>v-huya</name>
-	<description>huya_video</description>
+	<name>ffmpeg-wrapper</name>
+	<description>ffmpeg-wrapper</description>
 
 	<!-- =============================== -->
 	<!-- module names -->
 	<!-- =============================== -->
-	<modules>
-		<!-- shared module -->
-		<module>v-huya-ffmpeg</module>
-	</modules>
-
-	<!-- ============================== -->
-	<!-- properties params -->
-	<!-- ============================== -->
 	<properties>
 		<!-- module version -->
 		<jdk.version>1.7</jdk.version>
@@ -33,8 +25,23 @@
 		<junit.version>4.12</junit.version>
 	</properties>
 
+	<!-- ============================== -->
+	<!-- properties params -->
+	<!-- ============================== -->
+	<modules>
+		<!-- shared module -->
+		<module>v-huya-ffmpeg</module>
+		<!--<module>v-huya-http</module>-->
+		<module>v-huya-transcode</module>
+	</modules>
+
 	<dependencyManagement>
 		<dependencies>
+			<dependency>
+		        <groupId>com.huya.v</groupId>
+		        <artifactId>v-huya-ffmpeg</artifactId>
+		        <version>0.1-SNAPSHOT</version>
+		    </dependency>
 			<!-- servlet+jsp -->
 			<dependency>
 				<groupId>javax.servlet</groupId>
@@ -53,6 +60,11 @@
 				<artifactId>jstl</artifactId>
 				<version>1.2</version>
 			</dependency>
+			<dependency>
+                <groupId>javax.cache</groupId>
+                <artifactId>cache-api</artifactId>
+                <version>1.0.0</version>
+            </dependency>
 
 			<!-- spring framework -->
 			<dependency>
@@ -412,6 +424,19 @@
 				<version>${junit.version}</version>
 				<scope>test</scope>
 			</dependency>
+
+            <!-- AWS SDK -->
+            <dependency>
+                <groupId>com.huya.amazonaws</groupId>
+                <artifactId>aws-java-sdk</artifactId>
+                <version>1.11.69</version>
+            </dependency>
+
+            <dependency>
+                <groupId>joda-time</groupId>
+                <artifactId>joda-time</artifactId>
+                <version>2.9.7</version>
+            </dependency>
 
 		</dependencies>
 	</dependencyManagement>

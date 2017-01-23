@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>com.huya.v</groupId>
-		<artifactId>v-huya</artifactId>
+		<artifactId>ffmpeg-wrapper</artifactId>
 		<version>0.1-SNAPSHOT</version>
 	</parent>
 	<artifactId>v-huya-ffmpeg</artifactId>
@@ -15,6 +15,11 @@
 			<artifactId>junit</artifactId>
 			<scope>test</scope>
 		</dependency>
+
+		<dependency>
+            <groupId>javax.cache</groupId>
+            <artifactId>cache-api</artifactId>
+        </dependency>
 
 		<dependency>
 			<groupId>org.apache.commons</groupId>

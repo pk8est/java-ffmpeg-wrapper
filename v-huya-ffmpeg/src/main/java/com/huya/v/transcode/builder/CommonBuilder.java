@@ -4,6 +4,7 @@ import com.huya.v.transcode.ffprobe.FFmpegProbeResult;
 import com.huya.v.transcode.progress.ProgressDataListener;
 import com.huya.v.transcode.progress.ProgressListener;
 
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
 import java.util.ArrayList;
@@ -21,7 +22,9 @@ public class CommonBuilder {
     URI progress;
     List<String> options = new ArrayList<>();
     final List<ProgressListener> progressListeners = new ArrayList<>();
+    final List<FFmpegInputBuilder> inputs = new ArrayList<>();
     final List<FFmpegOutputBuilder> outputs = new ArrayList<>();
+    final List<InputStream> inputStreams = new ArrayList<>();
     final List<OutputStream> outputStreams = new ArrayList<>();
     final List<ProgressDataListener> progressDataListeners = new ArrayList<>();
     final Map<String, FFmpegProbeResult> inputProbes = new TreeMap<>();
@@ -64,6 +67,10 @@ public class CommonBuilder {
 
     public List<OutputStream> getOutputStreams(){
         return outputStreams;
+    }
+
+    public List<InputStream> getInputStreams(){
+        return inputStreams;
     }
 
     public List<ProgressDataListener> getProgressDataListeners() {

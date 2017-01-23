@@ -1,6 +1,5 @@
 package com.huya.v.transcode.job;
 
-import com.google.common.base.Throwables;
 import com.huya.v.transcode.FFmpeg;
 import com.huya.v.transcode.FFprobe;
 import com.huya.v.transcode.builder.FFmpegBuilder;
@@ -56,11 +55,19 @@ public class SinglePassFFmpegJob extends FFmpegJob{
         return  ffprobe.probe(builder.getInputs().get(index));
     }
 
-    public void run() {
+    public void run(){
 
         state = State.RUNNING;
 
         try {
+            ffmpeg.run(builder, listener);
+            state = State.FINISHED;
+
+        } catch (IOException e) {
+            state = State.FAILED;
+            errorMessage = e.getMessage();
+        }
+        /*try {
             ffmpeg.run(builder, listener);
             state = State.FINISHED;
 
@@ -69,7 +76,7 @@ public class SinglePassFFmpegJob extends FFmpegJob{
 
             Throwables.throwIfUnchecked(t);
             throw new RuntimeException(t);
-        }
+        }*/
     }
 
 }

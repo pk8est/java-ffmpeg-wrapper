@@ -9,10 +9,7 @@ import com.huya.v.transcode.progress.Progress;
 import com.huya.v.transcode.progress.ProgressDataListener;
 import com.huya.v.transcode.progress.ProgressListener;
 
-import java.io.BufferedOutputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 
 /**
  * Created by Administrator on 2016/12/26.
@@ -117,6 +114,7 @@ public class test {
         FFmpegExecutor executor = new FFmpegExecutor();
         FFmpegBuilder builder = new FFmpegBuilder();
         builder.addInput(input_1);
+        //builder.addInput(new FileInputStream(input_1));
         builder.addOption("-f", "mpegts");
         //builder.addOutput(output_1, new String[]{"-f", "mpegts", "-b:v", "2000k"});
         //builder.addOutput(output_2, new String[]{"-f", "mp4", "-b:v", "200k"});
@@ -135,6 +133,9 @@ public class test {
         });
         FFmpegJob job = executor.createJob(builder);
         job.run();
+        if(!job.isSuccess()){
+            System.err.println(job.getErrorMessage());
+        }
     }
 
     public static void defaultTranscode() throws Exception{

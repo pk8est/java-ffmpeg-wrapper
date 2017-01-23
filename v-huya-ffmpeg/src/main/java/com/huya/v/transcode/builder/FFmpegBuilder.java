@@ -5,9 +5,9 @@ import com.google.common.collect.ImmutableList;
 import com.huya.v.transcode.ffprobe.FFmpegProbeResult;
 import com.huya.v.transcode.progress.ProgressDataListener;
 
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.List;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -55,7 +55,6 @@ public class FFmpegBuilder extends CommonBuilder {
     // Input settings
     boolean stdout = true;
     boolean pipe = false;
-    final List<String> inputs = new ArrayList<>();
 
     public FFmpegBuilder(){}
 
@@ -99,7 +98,7 @@ public class FFmpegBuilder extends CommonBuilder {
         return stdout;
     }
 
-    public List<String> getInputs(){
+    public List<FFmpegInputBuilder> getInputs(){
         return inputs;
     }
 
@@ -123,7 +122,15 @@ public class FFmpegBuilder extends CommonBuilder {
 
     public FFmpegBuilder addInput(String filename) {
         checkNotNull(filename);
-        inputs.add(filename);
+        FFmpegInputBuilder input = new FFmpegInputBuilder(this, filename);
+        inputs.add(input);
+        return this;
+    }
+
+    public FFmpegBuilder addInput(InputStream stream){
+        FFmpegInputBuilder input = new FFmpegInputBuilder(this, stream);
+        inputs.add(input);
+        inputStreams.add(stream);
         return this;
     }
 
@@ -234,10 +241,9 @@ public class FFmpegBuilder extends CommonBuilder {
             args.add("-progress", progress.toString());
         }
 
-        for (String input : inputs) {
-            args.add("-i", input);
+        for (FFmpegInputBuilder input : this.inputs) {
+            args.addAll(input.build(this));
         }
-
         args.addAll(options);
 
         if (pass > 0) {

@@ -1,6 +1,5 @@
 package com.huya.v.transcode.progress;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -39,7 +38,7 @@ class TcpProgressParserRunnable implements Runnable {
             } catch (SocketException e) {
                 // Most likley a Socket closed exception, which we can safely ignore
 
-            } catch (IOException e) {
+            } catch (Exception e) {
                 // We have no good way to report this back to the user... yet
                 // TODO Report to the user that this failed in some way
             }

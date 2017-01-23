@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context" xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:ehcache="http://www.springframework.org/schema/cache"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+        http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
+        http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache.xsd">
+
+    <!-- 启动注解 -->
+    <context:annotation-config />
+
+    <!-- 定义组件查找规则 -->
+    <context:component-scan base-package="com.huya.v.controller" />
+    <context:component-scan base-package="com.huya.v.service" />
+    <context:component-scan base-package="com.huya.v.preset" />
+    <context:component-scan base-package="com.huya.v.util" />
+
+    <mvc:annotation-driven />
+
+    <ehcache:annotation-driven />
+
+    <bean id="exceptionHandler" class="com.huya.v.exceptions.WebExceptionHandler" />
+
+    <bean id="propertyConfigurer" class="com.huya.v.util.PropertyFactory">
+        <property name="locations">
+            <list>
+                <value>classpath:config.properties</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="ehcacheManager" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean">
+        <property name="configLocation" value="classpath:ehcache.xml" />
+    </bean>
+
+    <bean id="cacheManager" class="org.springframework.cache.ehcache.EhCacheCacheManager">
+        <property name="cacheManager" ref="ehcacheManager" />
+        <property name="transactionAware" value="true" />
+    </bean>
+
+    <!--<bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="locations">
+            <array>
+                <value>classpath:config.properties</value>
+            </array>
+        </property>
+    </bean>-->
+
+    <!-- 视图解释类 -->
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="prefix" value="/WEB-INF/jsp/" />
+        <property name="suffix" value=".jsp" />
+        <property name="viewClass" value="org.springframework.web.servlet.view.JstlView" />
+    </bean>
+
+    <!-- 静态资源映射 -->
+    <mvc:resources mapping="/resource/**" location="/resource/" />
+    <mvc:resources mapping="/crossdomain.xml" location="/resource/" />
+
+    <!-- 自定义的JSON ObjectMapper -->
+    <mvc:annotation-driven>
+        <mvc:message-converters register-defaults="true">
+            <!--json处理 -->
+            <bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+                <!--<property name="objectMapper" ref="dateObjectMapper" />-->
+            </bean>
+        </mvc:message-converters>
+    </mvc:annotation-driven>
+
+    <!--<bean id="dateObjectMapper" class="com.huya.v.util.DateObjectMapper">
+        <property name="serializationInclusion">
+            <value type="com.fasterxml.jackson.annotation.JsonInclude.Include">NON_NULL</value>
+        </property>
+    </bean>-->
+
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver" />
+
+    <!--<mvc:interceptors>
+        <mvc:interceptor>
+            <mvc:mapping path="/**" />
+            <mvc:exclude-mapping path="/video/**" />
+            <mvc:exclude-mapping path="/user/index.html" />
+            <mvc:exclude-mapping path="/user/yyLogin.html" />
+            <mvc:exclude-mapping path="/user/loginCallback.html" />
+            <bean class="com.huya.v.filters.SecurityInterceptor"></bean>
+        </mvc:interceptor>
+    </mvc:interceptors>-->
+
+</beans>

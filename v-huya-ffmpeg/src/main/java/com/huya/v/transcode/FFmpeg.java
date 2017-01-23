@@ -1,16 +1,17 @@
 package com.huya.v.transcode;
 
-import com.google.common.io.CharStreams;
 import com.huya.v.transcode.builder.CommonBuilder;
 import com.huya.v.transcode.execute.Processor;
 import com.huya.v.transcode.execute.RunProcessor;
-import com.huya.v.transcode.progress.*;
-import com.sun.istack.internal.Nullable;
+import com.huya.v.transcode.progress.ProgressListener;
+import com.huya.v.transcode.progress.ProgressParser;
+import com.huya.v.transcode.progress.TcpProgressParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.URISyntaxException;
 import java.util.List;
 
@@ -25,6 +26,7 @@ public class FFmpeg extends FFcommon{
     public String path = "ffmpeg";
     public final static String FFMPEG = "ffmpeg";
     public final static String DEFAULT_PATH = firstNonNull(System.getenv("FFMPEG"), FFMPEG);
+    private static final Logger LOG = LoggerFactory.getLogger(FFmpeg.class);
 
     public FFmpeg() throws IOException {
         this(DEFAULT_PATH, new RunProcessor());
@@ -59,49 +61,17 @@ public class FFmpeg extends FFcommon{
     public void run(CommonBuilder builder, @Nullable ProgressListener listener) throws IOException {
         checkNotNull(builder);
         checkIfFFmpeg();
-
+        command = path(builder.build());
+        Process process = runProcessor.run(command);
         if (listener != null) {
             try (ProgressParser progressParser = createProgressParser(listener)) {
                 progressParser.start();
-                builder = builder.addProgress(progressParser.getUri());
-                Process process = runProcessor.run(path(builder.build()));
-                writerStdout(builder, process);
+                builder.addProgress(progressParser.getUri());
             }
-        } else {
-            writerStdout(builder, runProcessor.run(path(builder.build())));
         }
+        writerStdin(builder, process);
+        writerStdout(builder, process);
 
-    }
-
-    protected void writerStdout(CommonBuilder builder, Process process) throws IOException{
-        try {
-            List<OutputStream> outputStreams = builder.getOutputStreams();
-            List<ProgressDataListener> progressDataListeners = builder.getProgressDataListeners();
-            List<ProgressListener> progressListeners = builder.getProgressListeners();
-            if(!progressListeners.isEmpty()){
-                callProgressListener(process, progressListeners);
-            }
-            if(progressDataListeners.isEmpty() && outputStreams.isEmpty()){
-                CharStreams.copy(wrapInReader(process), System.out);
-            }else{
-                InputStream in = process.getInputStream();
-                new ProgressStdout(in, progressDataListeners, outputStreams).run();
-            }
-            throwOnError(process);
-
-        }catch (Exception e){
-            e.printStackTrace();
-        }finally {
-            process.destroy();
-        }
-    }
-
-    private void callProgressListener(Process process, List<ProgressListener> progressListeners) throws IOException {
-        InputStream in;
-        in = process.getErrorStream();
-        for (ProgressListener listener: progressListeners){
-            new ProgressReader(in, listener).start();
-        }
     }
 
     protected ProgressParser createProgressParser(ProgressListener listener) throws IOException {

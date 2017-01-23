@@ -4,14 +4,14 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.io.CharStreams;
+import com.huya.v.transcode.builder.CommonBuilder;
 import com.huya.v.transcode.execute.Processor;
 import com.huya.v.transcode.execute.RunProcessor;
+import com.huya.v.transcode.progress.*;
 import com.huya.v.transcode.util.ProcessUtils;
 
 import javax.annotation.Nonnull;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -27,6 +27,8 @@ public class FFcommon {
     public String path;
     public final Processor runProcessor;
     String version = null;
+    Process process = null;
+    List command = null;
 
     public FFcommon(@Nonnull String path) {
         this(path, new RunProcessor());
@@ -36,6 +38,10 @@ public class FFcommon {
         Preconditions.checkArgument(!Strings.isNullOrEmpty(path));
         this.runProcessor = checkNotNull(runFunction);
         this.path = path;
+    }
+
+    public List getCommand(){
+        return command;
     }
 
     public String getPath() {
@@ -51,7 +57,9 @@ public class FFcommon {
                 CharStreams.copy(r, CharStreams.nullWriter()); // Throw away rest of the output
 
                 throwOnError(p);
-            } finally {
+            }catch (IOException e){
+                throw e;
+            }finally {
                 p.destroy();
             }
         }
@@ -94,5 +102,63 @@ public class FFcommon {
             process.destroy();
         }
     }
+    protected void readStdin(InputStream in, Process process) throws IOException {
+        OutputStream out = process.getOutputStream();
+        new ProgressStdin(in, out).run();
+    }
+
+    protected void writerStdin(CommonBuilder builder, Process process) throws IOException {
+        try {
+            List<InputStream> inputStreams = builder.getInputStreams();
+            if(!inputStreams.isEmpty()){
+                for (InputStream stream: inputStreams){
+                    readStdin(stream, process);
+                }
+            }
+        }catch (Exception e){
+            throw e;
+        }finally {
+            destroy();
+        }
+    }
+
+    protected void writerStdout(CommonBuilder builder, Process process) throws IOException {
+        try {
+            this.process = process;
+            List<OutputStream> outputStreams = builder.getOutputStreams();
+            List<ProgressDataListener> progressDataListeners = builder.getProgressDataListeners();
+            List<ProgressListener> progressListeners = builder.getProgressListeners();
+            if(!progressListeners.isEmpty()){
+                callProgressListener(process, progressListeners);
+            }
+            if(progressDataListeners.isEmpty() && outputStreams.isEmpty()){
+                CharStreams.copy(wrapInReader(process), System.out);
+            }else{
+                InputStream in = process.getInputStream();
+                new ProgressStdout(in, progressDataListeners, outputStreams).run();
+            }
+            throwOnError(process);
+
+        }catch (Exception e){
+            throw e;
+        }finally {
+            destroy();
+        }
+    }
+
+    protected void callProgressListener(Process process, List<ProgressListener> progressListeners) throws IOException {
+        InputStream in = process.getErrorStream();
+        for (ProgressListener listener: progressListeners){
+            new ProgressReader(in, listener).start();
+        }
+    }
+
+    public void destroy(){
+        if(process != null){
+            process.destroy();
+            process = null;
+        }
+    }
+
 
 }

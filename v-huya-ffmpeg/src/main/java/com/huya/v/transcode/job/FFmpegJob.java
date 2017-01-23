@@ -8,6 +8,7 @@ import com.huya.v.transcode.progress.ProgressListener;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
+import java.util.List;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -21,6 +22,7 @@ public abstract class FFmpegJob implements Runnable{
 
     final FFmpeg ffmpeg;
     final FFprobe ffprobe;
+    public String errorMessage;
     public FFmpegBuilder builder;
     final ProgressListener listener;
 
@@ -54,6 +56,24 @@ public abstract class FFmpegJob implements Runnable{
 
     public FFmpegProbeResult getFFprobeResult() throws IOException {
         return null;
+    }
+
+    public boolean isSuccess(){
+        return state == State.FINISHED;
+    }
+
+    public String getErrorMessage(){
+        return errorMessage;
+    }
+
+    public List getCommand(){
+        return ffmpeg.getCommand();
+    }
+
+    public void destroy(){
+        if(ffmpeg != null){
+            ffmpeg.destroy();
+        }
     }
 
     public State getState() {
